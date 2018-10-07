@@ -18,7 +18,6 @@ function createCardList(symbols) {
         card.setAttribute("class", "card");
         cardSymbol.setAttribute("class", "fa fa-" + symbols[i]);
         card.appendChild(cardSymbol);
-
         listOfCards.push(card); //card deck will consist of li's.
     }
     return listOfCards;
@@ -32,6 +31,20 @@ function createDeckOfCards(cardsArray){
         return item.cloneNode(true);
     }));
     return (deckOfCards);
+}
+
+function appendDecktoGrid(symbols) {
+
+    var set = createCardList(symbols);
+    var pairs = createDeckOfCards(set);
+    var shufflePairs = shuffle(pairs); 
+    var cardDeckHolder = document.getElementsByClassName("deck")[0];
+    
+    for (var i = 0; i < shufflePairs.length; i++) {
+        
+        cardDeckHolder.appendChild(shufflePairs[i]);
+    }
+
 }
 
 /*
@@ -56,6 +69,28 @@ function shuffle(array) {
     return array;
 }
 
+function deckEventListener(){
+    var deck = document.getElementsByClassName("deck")[0];
+    deck.addEventListener("click", turnOverCard, false);
+}
+
+function turnOverCard(elem){
+    debugger;
+    var target = elem.target;
+    if (target.classList.contains("open")) {
+        
+        if (target.classList.contains("show")) {
+            target.classList.remove("show", "open");
+        }
+        else {
+            target.classList.remove("open");
+        }
+    }
+    else {
+        target.classList.add("show", "open");
+    }
+}
+
 
 /*
  * set up the event listener for a card. If a card is clicked:
@@ -70,13 +105,8 @@ function shuffle(array) {
 
 document.addEventListener("DOMContentLoaded", function (){
     
-    var set = createCardList(mySymbols);
-    var pairs = createDeckOfCards(set);
-    var shufflePairs = shuffle(pairs); 
-    var cardDeckHolder = document.getElementsByClassName("deck")[0];
-    debugger;
-    for (var i = 0; i < shufflePairs.length; i++) {
-        
-        cardDeckHolder.appendChild(shufflePairs[i]);
-    }
+    appendDecktoGrid(mySymbols);
+    deckEventListener();
+    
+   
 });
