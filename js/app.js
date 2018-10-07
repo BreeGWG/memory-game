@@ -75,7 +75,7 @@ function deckEventListener(){
 }
 
 function turnOverCard(elem){
-    debugger;
+
     var target = elem.target;
     if (target.classList.contains("open")) {
         
