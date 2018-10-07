@@ -1,7 +1,38 @@
 /*
  * Create a list that holds all of your cards
  */
+ var mySymbols = ["diamond", "paper-plane-o", "anchor", "bolt", "cube", "leaf", "bicycle", "bomb"]; 
+// Symbol is the font-awesome icon class name.
+// I would list the types of cards. From that list of card types, I could create as many of each types that I would like to. 
+// Each card has unique characteristics. The symbol and the front-facing color.
+// In the array, I will list each unique symbol as a string.
+// Using that array of symbols, I will create a list of cards. 
 
+function createCardList(symbols) {
+    var listOfCards = [];
+
+    for (var i = 0; i < symbols.length; i++) {
+        var card = document.createElement("li"),
+            cardSymbol = document.createElement("i");
+
+        card.setAttribute("class", "card");
+        cardSymbol.setAttribute("class", "fa fa-" + symbols[i]);
+        card.appendChild(cardSymbol);
+
+        listOfCards.push(card); //card deck will consist of li's.
+    }
+    return listOfCards;
+}
+
+// Function creates a cloned a list of cards and merges it with the original card list. 
+function createDeckOfCards(cardsArray){
+
+    var deckOfCards = cardsArray.slice(0);
+    deckOfCards = deckOfCards.concat(cardsArray.map(function (item){
+        return item.cloneNode(true);
+    }));
+    return (deckOfCards);
+}
 
 /*
  * Display the cards on the page
@@ -36,3 +67,16 @@ function shuffle(array) {
  *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
  *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
  */
+
+document.addEventListener("DOMContentLoaded", function (){
+    
+    var set = createCardList(mySymbols);
+    var pairs = createDeckOfCards(set);
+    var shufflePairs = shuffle(pairs); 
+    var cardDeckHolder = document.getElementsByClassName("deck")[0];
+    debugger;
+    for (var i = 0; i < shufflePairs.length; i++) {
+        
+        cardDeckHolder.appendChild(shufflePairs[i]);
+    }
+});
