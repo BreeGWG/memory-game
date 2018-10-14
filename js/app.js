@@ -69,18 +69,64 @@ function shuffle(array) {
     return array;
 }
 
-function deckEventListener(){
+function deckEventListener() {
     var deck = document.getElementsByClassName("deck")[0];
     deck.addEventListener("click", turnOverCard, false);
 }
 
+function initialReveal() {
+
+    showAllCards();
+   
+    setTimeout(function(){
+        
+        hideAllCards();
+    
+    }, 3000);
+    
+}
+
+
+function showAllCards() {
+
+    var deck = document.getElementsByClassName("card");
+
+    for (var i = 0; i < deck.length; i++) {
+
+        deck[i].classList.add("show", "open");
+        
+    }
+
+}
+
+function hideAllCards() {
+
+    var deck = document.getElementsByClassName("card");
+
+    for (var i = 0; i < deck.length; i++) {
+
+        deck[i].classList.remove("show", "open");
+        
+    }
+
+
+}
+
+
 function turnOverCard(elem){
 
-    var target = elem.target;
+    var target;
+
+    if (elem.hasOwnProperty('target')) {
+        target = elem.target;
+    }
+    
+    target = elem;
+
     if (target.classList.contains("open")) {
         
         if (target.classList.contains("show")) {
-            target.classList.remove("show", "open");
+            
         }
         else {
             target.classList.remove("open");
@@ -106,6 +152,7 @@ function turnOverCard(elem){
 document.addEventListener("DOMContentLoaded", function (){
     
     appendDecktoGrid(mySymbols);
+    initialReveal();
     deckEventListener();
     
    
