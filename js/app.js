@@ -2,6 +2,12 @@
  * Create a list that holds all of your cards
  */
  var mySymbols = ["diamond", "paper-plane-o", "anchor", "bolt", "cube", "leaf", "bicycle", "bomb"]; 
+ var isPlaying = true;
+ var maxTries = 3;
+ var numberOfFlips = 2;
+ var selectedCards = [];
+ var maxNumberOfMoves = mySymbols.length;
+ var playerMoves = 0;
 // Symbol is the font-awesome icon class name.
 // I would list the types of cards. From that list of card types, I could create as many of each types that I would like to. 
 // Each card has unique characteristics. The symbol and the front-facing color.
@@ -27,9 +33,15 @@ function createCardList(symbols) {
 function createDeckOfCards(cardsArray){
 
     var deckOfCards = cardsArray.slice(0);
-    deckOfCards = deckOfCards.concat(cardsArray.map(function (item){
-        return item.cloneNode(true);
-    }));
+
+    for (var i = 1; i < numberOfFlips; i++) {
+
+        deckOfCards = deckOfCards.concat(cardsArray.map(function (item){
+            return item.cloneNode(true);
+        }));
+        
+    }
+    
     return (deckOfCards);
 }
 
@@ -69,9 +81,174 @@ function shuffle(array) {
     return array;
 }
 
+function clickCounter (event) {
+    if (!isPlaying) {
+        return;
+    }
+
+    if (event.target.classList.contains("card")) {
+
+        selectedCards.push(typeOfCard(event.target));
+        
+        if (selectedCards.length === numberOfFlips) {
+            verifyMatch(selectedCards.slice(0));
+            selectedCards.length = 0;
+        }
+    }
+    
+}
+
+/**
+ * 
+ * @param {HTMLElement} card 
+ */
+function typeOfCard (card) {
+
+    return card.querySelector('i');
+
+}
+
+/**
+ * 
+ * @param {HTMLElement[]} selection 
+ */
+function verifyMatch (selection) {
+console.log(selection);
+    if (!isPlaying) {
+        return;
+    }
+
+    var firstSelected = selection[0];
+
+    for (var i = 1; i < selection.length; i++) {
+
+        if (selection[i].className !== firstSelected.className) {
+            //mismatch;
+            flipBack(selection);
+            
+            verifyGameTries(false/*isMatch*/);
+            return;
+        }
+
+    }
+    verifyGameTries(true/*isMatch*/);
+    
+}
+
+/**
+ * 
+ * @param {HTMLElement[]} selection 
+ */
+function flipBack (selection) {
+
+    for (var i = 0; i < selection.length; i++) {
+
+        selection[i].parentNode.classList.add("mismatch");
+
+    }
+
+    setTimeout(function() {
+        for (var i = 0; i < selection.length; i++) {
+
+            selection[i].parentNode.classList
+                .remove("open", "mismatch");
+
+        }
+    },1000);
+    
+   
+}
+
+/**
+ * 
+ * @param {boolean} isMatch 
+ */
+function verifyGameTries (isMatch) {
+
+    playerMoves++;
+
+    if (isMatch) {
+         if( playerMoves === maxNumberOfMoves) {
+            
+            isPlaying = false;
+            if (confirm("You Win!\n\nTry again?")) {
+                resetGame();
+            } 
+         }
+    }
+    else {
+        maxTries--;
+        paintStatus();
+        if (maxTries === 0) {
+            isPlaying = false;
+            if (confirm("You loose!\n\nTry again?")) {
+                resetGame();
+            } 
+
+        }
+    }
+
+}
+
+function resetGame () {
+
+    isPlaying = true;
+    maxTries = 3;
+    numberOfFlips = 2;
+    selectedCards = [];
+    playerMoves = 0;
+
+   Array.prototype.slice.call(document.querySelectorAll(".card"))
+    .forEach(function (element) {
+        element.parentNode.removeChild(element);
+    });
+
+    paintStatus();
+    appendDecktoGrid(mySymbols);
+    initialReveal();
+}
+
+function paintStatus() {
+    var scorePanel = document.querySelector(".score-panel");
+    var moves = scorePanel.querySelector(".moves");
+    clearElement(moves);
+    moves.appendChild(document.createTextNode(maxTries)); 
+
+    //<li><i class="fa fa-star"></i></li>
+    var li = document.createElement("li");
+    var i = document.createElement("i");
+    i.className = "fa fa-star";
+    li.appendChild(i);
+
+    var stars = scorePanel.querySelector(".stars");
+    clearElement(stars);
+
+    for (var j = 0; j < maxTries; j++) {
+        stars.appendChild(li.cloneNode(true));
+    }
+
+}
+
 function deckEventListener() {
-    var deck = document.getElementsByClassName("deck")[0];
+    var deck = document.querySelector(".deck");
     deck.addEventListener("click", turnOverCard, false);
+    deck.addEventListener("click", clickCounter, false);
+}
+
+
+
+/**
+ * 
+ * @param {HTMLElement} elem 
+ */
+function clearElement(elem) {
+
+    while (elem.firstChild){
+
+        elem.firstChild.parentNode.removeChild(elem.firstChild);
+
+    }
+
 }
 
 function initialReveal() {
@@ -93,7 +270,7 @@ function showAllCards() {
 
     for (var i = 0; i < deck.length; i++) {
 
-        deck[i].classList.add("show", "open");
+        deck[i].classList.add("open");
         
     }
 
@@ -105,7 +282,7 @@ function hideAllCards() {
 
     for (var i = 0; i < deck.length; i++) {
 
-        deck[i].classList.remove("show", "open");
+        deck[i].classList.remove("open");
         
     }
 
@@ -113,27 +290,17 @@ function hideAllCards() {
 }
 
 
-function turnOverCard(elem){
+function turnOverCard(event){
 
-    var target;
-
-    if (elem.hasOwnProperty('target')) {
-        target = elem.target;
+    if (!isPlaying) {
+        return;
     }
     
-    target = elem;
-
-    if (target.classList.contains("open")) {
-        
-        if (target.classList.contains("show")) {
-            
-        }
-        else {
-            target.classList.remove("open");
-        }
+    if (event.target.classList.contains("open")) {
+        event.target.classList.remove("open");
     }
     else {
-        target.classList.add("show", "open");
+        event.target.classList.add("open");
     }
 }
 
@@ -151,9 +318,10 @@ function turnOverCard(elem){
 
 document.addEventListener("DOMContentLoaded", function (){
     
-    appendDecktoGrid(mySymbols);
-    initialReveal();
+    resetGame();
     deckEventListener();
+    document.querySelector(".restart")
+        .addEventListener("click", resetGame, false);
     
    
 });
