@@ -1,19 +1,29 @@
-/*
- * Create a list that holds all of your cards
- */
- var mySymbols = ["diamond", "paper-plane-o", "anchor", "bolt", "cube", "leaf", "bicycle", "bomb"]; 
- var isPlaying = true;
- var maxTries = 3;
- var numberOfFlips = 2;
- var selectedCards = [];
- var maxNumberOfMoves = mySymbols.length;
- var playerMoves = 0;
-// Symbol is the font-awesome icon class name.
-// I would list the types of cards. From that list of card types, I could create as many of each types that I would like to. 
-// Each card has unique characteristics. The symbol and the front-facing color.
-// In the array, I will list each unique symbol as a string.
-// Using that array of symbols, I will create a list of cards. 
 
+//Creates an module using an IIFE that will prevent variables from populating the global space.
+(function () {
+
+    "use strict";
+
+
+// Create an object that contains game session properties.
+ var session  = {
+
+    mySymbols: ["diamond", "paper-plane-o", "anchor", "bolt", "cube", "leaf", "bicycle", "bomb"], //card symbols
+    isPlaying: true, // enable or disable game play.
+    maxTries:  3, // max number of chances.
+    numberOfFlips: 2, // number of flips per chance.
+    selectedCards: [], // cards flipped per given chance.
+    playerMoves:  0
+
+ };
+
+ session.maxNumberOfMoves = session.mySymbols.length;// max number of matches per given session. 
+
+/**
+ * @description Create an HTMLCollection list representing game cards.
+ * @param {string[]} symbols 
+ * @returns {HTMLElement[]} An array of li elements.
+ */
 function createCardList(symbols) {
     var listOfCards = [];
 
@@ -30,11 +40,16 @@ function createCardList(symbols) {
 }
 
 // Function creates a cloned a list of cards and merges it with the original card list. 
+/**
+ * 
+ * @param {HTMLCollection} cardsArray 
+ */
+
 function createDeckOfCards(cardsArray){
 
     var deckOfCards = cardsArray.slice(0);
 
-    for (var i = 1; i < numberOfFlips; i++) {
+    for (var i = 1; i < session.numberOfFlips; i++) {
 
         deckOfCards = deckOfCards.concat(cardsArray.map(function (item){
             return item.cloneNode(true);
@@ -82,17 +97,17 @@ function shuffle(array) {
 }
 
 function clickCounter (event) {
-    if (!isPlaying) {
+    if (!session.isPlaying) {
         return;
     }
 
     if (event.target.classList.contains("card")) {
 
-        selectedCards.push(typeOfCard(event.target));
+        session.selectedCards.push(typeOfCard(event.target));
         
-        if (selectedCards.length === numberOfFlips) {
-            verifyMatch(selectedCards.slice(0));
-            selectedCards.length = 0;
+        if (session.selectedCards.length === session.numberOfFlips) {
+            verifyMatch(session.selectedCards.slice(0));
+            session.selectedCards.length = 0;
         }
     }
     
@@ -114,7 +129,7 @@ function typeOfCard (card) {
  */
 function verifyMatch (selection) {
 console.log(selection);
-    if (!isPlaying) {
+    if (!session.isPlaying) {
         return;
     }
 
@@ -165,22 +180,22 @@ function flipBack (selection) {
  */
 function verifyGameTries (isMatch) {
 
-    playerMoves++;
+    session.playerMoves++;
 
     if (isMatch) {
-         if( playerMoves === maxNumberOfMoves) {
+         if( session.playerMoves === session.maxNumberOfMoves) {
             
-            isPlaying = false;
+            session.isPlaying = false;
             if (confirm("You Win!\n\nTry again?")) {
                 resetGame();
             } 
          }
     }
     else {
-        maxTries--;
+        session.maxTries--; //decrement max number of tries.
         paintStatus();
-        if (maxTries === 0) {
-            isPlaying = false;
+        if (session.maxTries === 0) {
+            session.isPlaying = false;
             if (confirm("You loose!\n\nTry again?")) {
                 resetGame();
             } 
@@ -192,11 +207,11 @@ function verifyGameTries (isMatch) {
 
 function resetGame () {
 
-    isPlaying = true;
-    maxTries = 3;
-    numberOfFlips = 2;
-    selectedCards = [];
-    playerMoves = 0;
+    session.isPlaying = true;
+    session.maxTries = 3;
+    session.numberOfFlips = 2;
+    session.selectedCards = [];
+    session.playerMoves = 0;
 
    Array.prototype.slice.call(document.querySelectorAll(".card"))
     .forEach(function (element) {
@@ -204,7 +219,7 @@ function resetGame () {
     });
 
     paintStatus();
-    appendDecktoGrid(mySymbols);
+    appendDecktoGrid(session.mySymbols);
     initialReveal();
 }
 
@@ -212,7 +227,7 @@ function paintStatus() {
     var scorePanel = document.querySelector(".score-panel");
     var moves = scorePanel.querySelector(".moves");
     clearElement(moves);
-    moves.appendChild(document.createTextNode(maxTries)); 
+    moves.appendChild(document.createTextNode(session.maxTries)); 
 
     //<li><i class="fa fa-star"></i></li>
     var li = document.createElement("li");
@@ -223,7 +238,7 @@ function paintStatus() {
     var stars = scorePanel.querySelector(".stars");
     clearElement(stars);
 
-    for (var j = 0; j < maxTries; j++) {
+    for (var j = 0; j < session.maxTries; j++) {
         stars.appendChild(li.cloneNode(true));
     }
 
@@ -234,8 +249,6 @@ function deckEventListener() {
     deck.addEventListener("click", turnOverCard, false);
     deck.addEventListener("click", clickCounter, false);
 }
-
-
 
 /**
  * 
@@ -262,7 +275,6 @@ function initialReveal() {
     }, 3000);
     
 }
-
 
 function showAllCards() {
 
@@ -292,7 +304,7 @@ function hideAllCards() {
 
 function turnOverCard(event){
 
-    if (!isPlaying) {
+    if (!session.isPlaying) {
         return;
     }
     
@@ -325,3 +337,4 @@ document.addEventListener("DOMContentLoaded", function (){
     
    
 });
+})(); 
