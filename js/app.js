@@ -26,7 +26,7 @@
  */
 function createCardList(symbols) {
     var listOfCards = [];
-
+    //loop through each card and create its HTML  
     for (var i = 0; i < symbols.length; i++) {
         var card = document.createElement("li"),
             cardSymbol = document.createElement("i");
@@ -39,12 +39,11 @@ function createCardList(symbols) {
     return listOfCards;
 }
 
-// Function creates a cloned a list of cards and merges it with the original card list. 
 /**
- * 
- * @param {HTMLCollection} cardsArray 
+ *@description Aggregates an array of cards to create a complete card deck. 
+ *@param {HTMLElement[]} cardsArray
+ *@returns {HTMLElement[]} An array of li elements.
  */
-
 function createDeckOfCards(cardsArray){
 
     var deckOfCards = cardsArray.slice(0);
@@ -56,17 +55,20 @@ function createDeckOfCards(cardsArray){
         }));
         
     }
-    
-    return (deckOfCards);
+    return deckOfCards;
 }
 
+/**
+ *@description Display the cards on the page by appending a deck of cards to a DOM element.
+ *@param {string[]} symbols.
+ */
 function appendDecktoGrid(symbols) {
 
     var set = createCardList(symbols);
     var pairs = createDeckOfCards(set);
     var shufflePairs = shuffle(pairs); 
     var cardDeckHolder = document.getElementsByClassName("deck")[0];
-    
+    //add each card's HTML to the page
     for (var i = 0; i < shufflePairs.length; i++) {
         
         cardDeckHolder.appendChild(shufflePairs[i]);
@@ -74,14 +76,13 @@ function appendDecktoGrid(symbols) {
 
 }
 
-/*
- * Display the cards on the page
- *   - shuffle the list of cards using the provided "shuffle" method below
- *   - loop through each card and create its HTML
- *   - add each card's HTML to the page
+//
+/**
+ * @description Shuffle any array of cards using the provided "shuffle" method below.
+ * Shuffle function borrowed from http://stackoverflow.com/a/2450976
+ * @param {HTMLElement[]} array
+ * @returns {HTMLElement[]} A randomly arranged array of html li elements.
  */
-
-// Shuffle function from http://stackoverflow.com/a/2450976
 function shuffle(array) {
     var currentIndex = array.length, temporaryValue, randomIndex;
 
@@ -96,13 +97,19 @@ function shuffle(array) {
     return array;
 }
 
-function clickCounter (event) {
-    if (!session.isPlaying) {
+/**
+ * @description Determines if selected ("clicked") cards results in a match.
+ * @param {Event} event 
+ */
+function matchIdentifier (event) {
+
+    if (!session.isPlaying ) {
+        //ignore card deck events when session is over.
         return;
     }
 
     if (event.target.classList.contains("card")) {
-
+        //push selected card into an array used for comparision.
         session.selectedCards.push(typeOfCard(event.target));
         
         if (session.selectedCards.length === session.numberOfFlips) {
@@ -114,8 +121,9 @@ function clickCounter (event) {
 }
 
 /**
- * 
+ * @description Returns the symbol element of a given card. 
  * @param {HTMLElement} card 
+ * @return {HTMLElement} i
  */
 function typeOfCard (card) {
 
@@ -124,66 +132,68 @@ function typeOfCard (card) {
 }
 
 /**
- * 
- * @param {HTMLElement[]} selection 
+ * @description Checks if a set of selected cards are matched. If not, then 
+ * flip back cards and verifies the number of tries left.
+ * @param {HTMLElement[]} selections 
  */
-function verifyMatch (selection) {
-console.log(selection);
-    if (!session.isPlaying) {
+function verifyMatch (selections) {
+
+    if (!session.isPlaying) { //if game is over, do nothing.
         return;
     }
 
-    var firstSelected = selection[0];
+    var firstSelected = selections[0];
 
-    for (var i = 1; i < selection.length; i++) {
+    for (var i = 1; i < selections.length; i++) {
 
-        if (selection[i].className !== firstSelected.className) {
+        if (selections[i].className !== firstSelected.className) {
             //mismatch;
-            flipBack(selection);
+            flipBack(selections); //turn over mismatched cards
             
-            verifyGameTries(false/*isMatch*/);
+            verifyGameTries(false/*isMatch*/); //removes chance
             return;
         }
 
     }
-    verifyGameTries(true/*isMatch*/);
+    verifyGameTries(true/*isMatch*/); //checks # of chances left.
     
 }
 
 /**
- * 
- * @param {HTMLElement[]} selection 
+ * @description Hides mismatched selected cards symbols. 
+ * @param {HTMLElement[]} selections 
  */
-function flipBack (selection) {
+function flipBack (selections) {
 
-    for (var i = 0; i < selection.length; i++) {
+    for (var i = 0; i < selections.length; i++) {
 
-        selection[i].parentNode.classList.add("mismatch");
+        selections[i].parentNode.classList.add("mismatch");
 
     }
 
-    setTimeout(function() {
-        for (var i = 0; i < selection.length; i++) {
+    //Hides mismatched selected cards symbols after a brief pause
+    setTimeout(function() { 
+        for (var i = 0; i < selections.length; i++) {
 
-            selection[i].parentNode.classList
+            selections[i].parentNode.classList
                 .remove("open", "mismatch");
-
         }
     },1000);
-    
-   
+
 }
 
 /**
- * 
+ * @description Determines if a gamer wins the game or looses a chance to win the game.
  * @param {boolean} isMatch 
  */
 function verifyGameTries (isMatch) {
 
     session.playerMoves++;
 
+    //Checks if player has any chances left.
     if (isMatch) {
-         if( session.playerMoves === session.maxNumberOfMoves) {
+         //Max number of matches reached.
+         if(session.playerMoves === session.maxNumberOfMoves) {
             
             session.isPlaying = false;
             if (confirm("You Win!\n\nTry again?")) {
@@ -193,7 +203,7 @@ function verifyGameTries (isMatch) {
     }
     else {
         session.maxTries--; //decrement max number of tries.
-        paintStatus();
+        paintStatus(); //updates the view of game chances.
         if (session.maxTries === 0) {
             session.isPlaying = false;
             if (confirm("You loose!\n\nTry again?")) {
@@ -202,7 +212,6 @@ function verifyGameTries (isMatch) {
 
         }
     }
-
 }
 
 function resetGame () {
@@ -247,7 +256,7 @@ function paintStatus() {
 function deckEventListener() {
     var deck = document.querySelector(".deck");
     deck.addEventListener("click", turnOverCard, false);
-    deck.addEventListener("click", clickCounter, false);
+    deck.addEventListener("click", matchIdentifier, false);
 }
 
 /**
