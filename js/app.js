@@ -214,24 +214,32 @@ function verifyGameTries (isMatch) {
     }
 }
 
+/**
+ * @description Resets game session properties back to default and sets
+ *  a new card deck.
+ */
 function resetGame () {
-
+    // game session properties
     session.isPlaying = true;
     session.maxTries = 3;
     session.numberOfFlips = 2;
     session.selectedCards = [];
     session.playerMoves = 0;
-
+  
+   //removes old cards
    Array.prototype.slice.call(document.querySelectorAll(".card"))
     .forEach(function (element) {
         element.parentNode.removeChild(element);
     });
 
-    paintStatus();
-    appendDecktoGrid(session.mySymbols);
-    initialReveal();
+    paintStatus(); //display game status bar
+    appendDecktoGrid(session.mySymbols); //display new card deck
+    initialReveal(); //briefly reveal card deck.
 }
 
+/**
+ * @description Creates a status bar that displays game chances.
+ */
 function paintStatus() {
     var scorePanel = document.querySelector(".score-panel");
     var moves = scorePanel.querySelector(".moves");
@@ -253,6 +261,10 @@ function paintStatus() {
 
 }
 
+
+/**
+ * @description This functions manages click events on the game deck.
+ */
 function deckEventListener() {
     var deck = document.querySelector(".deck");
     deck.addEventListener("click", turnOverCard, false);
@@ -260,7 +272,7 @@ function deckEventListener() {
 }
 
 /**
- * 
+ * @description Removes an html element from the DOM.
  * @param {HTMLElement} elem 
  */
 function clearElement(elem) {
@@ -273,6 +285,9 @@ function clearElement(elem) {
 
 }
 
+/**
+ * @description Briefly reveals card symbols on the card deck.
+ */
 function initialReveal() {
 
     showAllCards();
@@ -285,6 +300,9 @@ function initialReveal() {
     
 }
 
+/**
+ * @description Adds class to card that reveal card symbols. 
+ */
 function showAllCards() {
 
     var deck = document.getElementsByClassName("card");
@@ -297,6 +315,9 @@ function showAllCards() {
 
 }
 
+/**
+ * @description Adds class to card that hides card symbols. 
+ */
 function hideAllCards() {
 
     var deck = document.getElementsByClassName("card");
@@ -310,7 +331,10 @@ function hideAllCards() {
 
 }
 
-
+/**
+ * @description toggles card flips
+ * @param {event} event 
+ */
 function turnOverCard(event){
 
     if (!session.isPlaying) {
@@ -337,13 +361,14 @@ function turnOverCard(event){
  *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
  */
 
+ /**
+  * @description Initalizes game and adds gameboard event listeners
+  */
 document.addEventListener("DOMContentLoaded", function (){
     
     resetGame();
     deckEventListener();
     document.querySelector(".restart")
         .addEventListener("click", resetGame, false);
-    
-   
 });
 })(); 
