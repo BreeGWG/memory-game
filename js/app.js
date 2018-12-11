@@ -244,7 +244,7 @@
             if(session.isPlaying) {
                 session.gameClock = session.gameClock + 1;
                 document.querySelector(".timer").innerHTML = session.gameClock;
-                console.log(session.gameClock);
+                
             }
         }, 1000);
     }
@@ -252,12 +252,10 @@
     function stopGameClock (clockHandler) {
 
         clearInterval(clockHandler);
-        console.log("stopped game clock");
 
     }
 
     function manageGameClock () {
-        debugger;
 
         if (session.gameClock === 0) {
               session.clockCounter = startGameClock();
