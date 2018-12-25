@@ -221,30 +221,32 @@
      */
     function resetGame () {
         // game session properties
+
         session.isPlaying = true;
         session.maxTries = 3;
         session.numberOfFlips = 2;
         session.selectedCards = [];
         session.playerMoves = 0;
-        //session.gameClock = 0;
+        session.gameClock = 0;
 
         //removes old cards
         Array.prototype.slice.call(document.querySelectorAll(".card"))
         .forEach(function (element){
             element.parentNode.removeChild(element);
         });
-
+        
         paintStatus(); //display game status bar
         appendDecktoGrid(session.mySymbols); //display new card deck
         initialReveal(); //briefly reveal card deck.
     }
 
     function startGameClock () {
+
         return setInterval(function () {
             if(session.isPlaying) {
                 session.gameClock = session.gameClock + 1;
                 document.querySelector(".timer").innerHTML = session.gameClock;
-                
+
             }
         }, 1000);
     }
@@ -256,18 +258,19 @@
     }
 
     function manageGameClock () {
-
-        if (session.gameClock === 0) {
-              session.clockCounter = startGameClock();
-
-        }
-        else {
-            stopGameClock(session.clockCounter);
-            console.log(session.gameClock);
+debugger;
+        //reset the game clock if game is in session
+        if (session.isPlaying) {
             session.gameClock = 0;
+             //an interval counter exists, clear the counter
+            if(session.clockCounter) {
+                stopGameClock(session.clockCounter);
+            }
+        }
+        //generate a new counter.
+        else {
             session.clockCounter = startGameClock();
         }
-
     }
 
     /**
@@ -325,6 +328,7 @@
         showAllCards();
 
         setTimeout(function(){
+            session.isPlaying = true;
             hideAllCards();
             manageGameClock();
         }, 3000);
@@ -394,7 +398,6 @@
      * @description Initalizes game and adds gameboard event listeners
      */
     document.addEventListener("DOMContentLoaded", function (){
-
     resetGame();
     deckEventListener();
         document.querySelector(".restart")
