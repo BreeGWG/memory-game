@@ -116,4 +116,7 @@ h1 {
     display: inline-block;
     margin: 0 50px;
 }
+.score-panel .chances-container {
+    float: left;
+}
 
