@@ -10,7 +10,8 @@
 
         mySymbols: ["diamond", "paper-plane-o", "anchor", "bolt", "cube", "leaf", "bicycle", "bomb"], //card symbols
         isPlaying: true, // enable or disable game play.
-        maxTries:  3, // max number of chances.
+        maxChances: 3,  // max number of changes.
+        maxTries:  3, // max number of tries left.
         numberOfFlips: 2, // number of flips per chance.
         selectedCards: [], // cards flipped per given chance.
         playerMoves:  0,
@@ -68,7 +69,7 @@
 
         var set = createCardList(symbols);
         var pairs = createDeckOfCards(set);
-        var shufflePairs = shuffle(pairs); 
+        var shufflePairs = shuffle(pairs);
         var cardDeckHolder = document.getElementsByClassName("deck")[0];
         //add each card's HTML to the page
         for (var i = 0; i < shufflePairs.length; i++) {
@@ -150,7 +151,6 @@
             if (selections[i].className !== firstSelected.className) {
                 //mismatch;
                 flipBack(selections); //turn over mismatched cards
-                
                 verifyGameTries(false/*isMatch*/); //removes chance
                 return;
             }
@@ -189,17 +189,17 @@
      */
     function verifyGameTries (isMatch) {
 
-        session.playerMoves++;
-
         //Checks if player has any chances left.
         if (isMatch) {
+            session.playerMoves++;
             //Max number of matches reached.
             if(session.playerMoves === session.maxNumberOfMoves) {
 
                 session.isPlaying = false;
-                if (confirm("You Win!\n\nTry again?")) {
+                if (confirm("You Win!\n\nYou time was: " + session.clockCounter +
+                    " second(s)" + "\n\nTry again?")) {
                     resetGame();
-                } 
+                }
             }
         }
         else {
@@ -209,8 +209,7 @@
                 session.isPlaying = false;
                 if (confirm("You loose!\n\nTry again?")) {
                     resetGame();
-                } 
-
+                }
             }
         }
     }
@@ -221,56 +220,39 @@
      */
     function resetGame () {
         // game session properties
-
-        session.isPlaying = true;
+        session.isPlaying = false;
+        session.maxChances = 3;
         session.maxTries = 3;
         session.numberOfFlips = 2;
         session.selectedCards = [];
         session.playerMoves = 0;
         session.gameClock = 0;
+        session.clockCounter = 0;
 
         //removes old cards
         Array.prototype.slice.call(document.querySelectorAll(".card"))
-        .forEach(function (element){
-            element.parentNode.removeChild(element);
-        });
-        
+            .forEach(function (element){
+                element.parentNode.removeChild(element);
+            });
+
+        //manageGameClock();
         paintStatus(); //display game status bar
         appendDecktoGrid(session.mySymbols); //display new card deck
         initialReveal(); //briefly reveal card deck.
     }
 
-    function startGameClock () {
-
-        return setInterval(function () {
-            if(session.isPlaying) {
-                session.gameClock = session.gameClock + 1;
-                document.querySelector(".timer").innerHTML = session.gameClock;
-
+    function updateGameCounter () {
+        if(session.isPlaying) {
+            updateGameCounterView();
+            if (session.clockCounter === 0) {
+                //alert("Counter has started");                
             }
-        }, 1000);
+            session.clockCounter++;
+        }
     }
 
-    function stopGameClock (clockHandler) {
-
-        clearInterval(clockHandler);
-
-    }
-
-    function manageGameClock () {
-debugger;
-        //reset the game clock if game is in session
-        if (session.isPlaying) {
-            session.gameClock = 0;
-             //an interval counter exists, clear the counter
-            if(session.clockCounter) {
-                stopGameClock(session.clockCounter);
-            }
-        }
-        //generate a new counter.
-        else {
-            session.clockCounter = startGameClock();
-        }
+    function updateGameCounterView () {
+        document.querySelector(".timer").innerHTML = session.clockCounter;
     }
 
     /**
@@ -280,21 +262,36 @@ debugger;
         var scorePanel = document.querySelector(".score-panel");
         var moves = scorePanel.querySelector(".moves");
         clearElement(moves);
-        moves.appendChild(document.createTextNode(session.maxTries)); 
+        moves.appendChild(document.createTextNode(session.maxTries));
+        updateGameCounterView();
 
         //<li><i class="fa fa-star"></i></li>
         var li = document.createElement("li");
         var i = document.createElement("i");
+        var stars = scorePanel.querySelector(".stars");
+
+        li.setAttribute("class", "status-symbol-holder");
         i.className = "fa fa-star";
         li.appendChild(i);
 
-        var stars = scorePanel.querySelector(".stars");
         clearElement(stars);
 
-        for (var j = 0; j < session.maxTries; j++) {
+        for (var j = 0; j < session.maxChances; j++) {
             stars.appendChild(li.cloneNode(true));
         }
 
+        if (session.maxTries !== session.maxChances) {
+            showChancesLeft();
+        }
+    }
+
+    function showChancesLeft() {
+
+        var triesLeft = document.getElementsByClassName("status-symbol-holder");
+        for(var i = session.maxTries; i < session.maxChances; i++) {
+            triesLeft[i].classList.add("hidden");
+
+        }
     }
 
     /**
@@ -330,7 +327,7 @@ debugger;
         setTimeout(function(){
             session.isPlaying = true;
             hideAllCards();
-            manageGameClock();
+            //manageGameClock();
         }, 3000);
     }
 
@@ -397,10 +394,17 @@ debugger;
     /**
      * @description Initalizes game and adds gameboard event listeners
      */
-    document.addEventListener("DOMContentLoaded", function (){
-    resetGame();
-    deckEventListener();
+    document.addEventListener("DOMContentLoaded", function (){     
+        resetGame();
+        deckEventListener();
         document.querySelector(".restart")
-        .addEventListener("click", resetGame, false);
+            .addEventListener("click", resetGame, false);
     });
+
+    setInterval(function () {
+        session.gameClock = session.gameClock + 1;
+        console.log(session.gameClock);
+        updateGameCounter();
+    }, 1000);
+
 })();

@@ -80,6 +80,11 @@ h1 {
 .deck .card.mismatch {
     background-color: darkorange;
 }
+
+.hidden {
+    visibility: hidden;
+}
+
 /*
  * Styles for the Score Panel
  */
@@ -106,3 +111,9 @@ h1 {
     float: right;
     cursor: pointer;
 }
+
+.time-holder {
+    display: inline-block;
+    margin: 0 50px;
+}
+
