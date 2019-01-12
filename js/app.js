@@ -10,9 +10,10 @@
 
         mySymbols: ["diamond", "paper-plane-o", "anchor", "bolt", "cube", "leaf", "bicycle", "bomb"], //card symbols
         isPlaying: true, // enable or disable game play.
-        maxChances: 3,  // max number of changes.
-        maxTries:  3, // max number of tries left.
+        maxChances: 5,  // max number of changes.
+        maxTries:  5, // max number of tries left.
         numberOfFlips: 2, // number of flips per chance.
+        gamerRating: 3, // Gamer ranking to start
         selectedCards: [], // cards flipped per given chance.
         playerMoves:  0,
         gameClock: 0,
@@ -197,7 +198,7 @@
 
                 session.isPlaying = false;
                 if (confirm("You Win!\n\nYou time was: " + session.clockCounter +
-                    " second(s)" + "\n\nTry again?")) {
+                    " second(s)" + "\n\nYou " + "\n\nTry again?")) {
                     resetGame();
                 }
             }
@@ -221,9 +222,10 @@
     function resetGame () {
         // game session properties
         session.isPlaying = false;
-        session.maxChances = 3;
-        session.maxTries = 3;
+        session.maxChances = 5;
+        session.maxTries = 5;
         session.numberOfFlips = 2;
+        session.gamerRanking = 3;
         session.selectedCards = [];
         session.playerMoves = 0;
         session.gameClock = 0;
@@ -276,20 +278,19 @@
 
         clearElement(stars);
 
-        for (var j = 0; j < session.maxChances; j++) {
+        manageStarRanking();
+        for (var j = 0; j < session.gamerRating; j++) {
             stars.appendChild(li.cloneNode(true));
         }
 
-        if (session.maxTries !== session.maxChances) {
-            showChancesLeft();
-        }
+        showPerformanceStars();
     }
 
-    function showChancesLeft() {
+    function showPerformanceStars() {
+        var stars = document.getElementsByClassName("status-symbol-holder");
 
-        var triesLeft = document.getElementsByClassName("status-symbol-holder");
-        for(var i = session.maxTries; i < session.maxChances; i++) {
-            triesLeft[i].classList.add("hidden");
+        for(var i = session.gamerRanking; 3 > i; i++) {
+            stars[i].classList.add("hidden");
 
         }
     }
@@ -329,6 +330,24 @@
             hideAllCards();
             //manageGameClock();
         }, 3000);
+    }
+
+    function manageStarRanking () {
+        var percentage = (session.maxTries/session.maxChances)*100;
+        switch (true) {
+            case (percentage === 100)  :   {
+                                                session.gamerRanking = 3;
+                                            }
+                                            break;
+            case (percentage < 100 &&
+                   percentage > 50)    :   {
+                                                session.gamerRanking = 2; 
+                                            }
+                                            break;
+            case (percentage < 50)    :   {
+                                                session.gamerRanking = 1;
+                                            }
+        }
     }
 
     /**
@@ -403,7 +422,6 @@
 
     setInterval(function () {
         session.gameClock = session.gameClock + 1;
-        console.log(session.gameClock);
         updateGameCounter();
     }, 1000);
 

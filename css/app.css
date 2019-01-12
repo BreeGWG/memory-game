@@ -91,7 +91,7 @@ h1 {
 
 .score-panel {
     text-align: left;
-    width: 345px;
+    width: 375px;
     margin-bottom: 10px;
 }
 
@@ -115,6 +115,7 @@ h1 {
 .time-holder {
     display: inline-block;
     margin: 0 50px;
+    overflow: hidden;
 }
 .score-panel .chances-container {
     float: left;
