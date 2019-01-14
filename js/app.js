@@ -198,7 +198,7 @@
 
                 session.isPlaying = false;
                 if (confirm("You Win!\n\nYou time was: " + session.clockCounter +
-                    " second(s)" + "\n\nYou " + "\n\nTry again?")) {
+                    " second(s)" + "\n\n Star Rating: " + session.gamerRating + "\n\nTry again?")) {
                     resetGame();
                 }
             }
@@ -346,7 +346,7 @@
                                             break;
             case (percentage < 50)    :   {
                                                 session.gamerRanking = 1;
-                                            }
+                                          }
         }
     }
 

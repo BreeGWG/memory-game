@@ -1,0 +1,37 @@
+.modal {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    background-color: rgba(100,100,100, .7)
+}
+
+.modal-message {
+    width: 400px;
+    height: 400px;
+    margin: 10% auto;
+    border-radius: 10px;
+    border: 1px solid white;
+    background: white;
+    text-align: center;
+}
+
+.modal h1 {
+    display: inline-block;
+    border-bottom: 1px solid grey;
+}
+
+button {
+    width: 100px;
+    height: 50px;
+    border-radius: 10px;
+}
+
+button .ok {
+    background: green;
+}
+
+button .cancel {
+    background: grey;
+}
