@@ -135,8 +135,8 @@
     }
 
     /**
-     * @description Checks if a set of selected cards are matched. If not, then 
-     * flip back cards and verifies the number of tries left.
+     * @description Checks if a set of selected cards are matched. 
+     * If not then flip back cards and verifies the number of tries left.
      * @param {HTMLElement[]} selections 
      */
     function verifyMatch (selections) {
@@ -186,6 +186,7 @@
 
     /**
      * @description Determines if a gamer wins the game or looses a chance to win the game.
+     * Displays win or loss modal when player wins the game or when the player loses the game.
      * @param {boolean} isMatch 
      */
     function verifyGameTries (isMatch) {
@@ -193,24 +194,37 @@
         //Checks if player has any chances left.
         if (isMatch) {
             session.playerMoves++;
-            //Max number of matches reached.
+            //Max number of matches reached. Player wins.
             if(session.playerMoves === session.maxNumberOfMoves) {
 
                 session.isPlaying = false;
-                if (confirm("You Win!\n\nYou time was: " + session.clockCounter +
-                    " second(s)" + "\n\n Star Rating: " + session.gamerRating + "\n\nTry again?")) {
-                    resetGame();
-                }
+                var winModal = new Modal("You Win!", "\n\nYou time was: " + session.clockCounter +
+                " second(s)" + "\n\n", " Star Rating: " + session.gamerRating + " star(s)");
+
+                //display modal for winning game
+                winModal.open(function (){
+
+                        resetGame();
+                    }
+                );
             }
         }
         else {
             session.maxTries--; //decrement max number of tries.
             paintStatus(); //updates the view of game chances.
             if (session.maxTries === 0) {
+
                 session.isPlaying = false;
-                if (confirm("You loose!\n\nTry again?")) {
-                    resetGame();
-                }
+                var loseModal = new Modal("Sorry, you lost!\n\n", 
+                "You found " + session.playerMoves + " matches" +
+                    "out of " + session.maxNumberOfMoves + matches
+                );
+
+                //display modal for winning game
+                loseModal.open(function (){
+
+                         resetGame();
+                });
             }
         }
     }
@@ -243,19 +257,23 @@
         initialReveal(); //briefly reveal card deck.
     }
 
+    /**
+     * @description Updates timing iterator
+     */
     function updateGameCounter () {
         if(session.isPlaying) {
             updateGameCounterView();
-            if (session.clockCounter === 0) {
-                //alert("Counter has started");                
-            }
             session.clockCounter++;
         }
     }
 
+    /**
+     * @description displays the game clock
+     */
     function updateGameCounterView () {
         document.querySelector(".timer").innerHTML = session.clockCounter;
     }
+
 
     /**
      * @description Creates a status bar that displays game chances.
@@ -286,6 +304,9 @@
         showPerformanceStars();
     }
 
+    /**
+     * @description This functions manages the view of the gamers performance stars.
+     */
     function showPerformanceStars() {
         var stars = document.getElementsByClassName("status-symbol-holder");
 
@@ -296,7 +317,7 @@
     }
 
     /**
-     * @description This functions manages click events on the game deck.
+     * @description This functions manages the click events on the game deck.
      */
     function deckEventListener() {
         var deck = document.querySelector(".deck");

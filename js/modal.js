@@ -1,10 +1,11 @@
-
-function Modal(message) { 
+function Modal(title, status, time) { 
 
     ++Modal.baseIndex; 
-    this.message = message;
+    this.title = title;
+    this.status =  status || "";
+    this.time = time || "";
     this.index = Modal.baseIndex;
-    this.elem = null // DOM object will be refe
+    this.elem = null; // DOM object will be refe
 
 }
 
@@ -21,10 +22,10 @@ Modal.closeAll = function () {
 };
 
 Modal.prototype.getMessage = function () {
-    return this.message;
+    return this.title;
 };
 
-Modal.prototype.open = function () {
+Modal.prototype.open = function (cb) {
     if (this.elem !== null){
         return; // the modal is already open
     }
@@ -34,32 +35,52 @@ Modal.prototype.open = function () {
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
 
-            that._view(xhr.responseText);
-            
+            that._view(xhr.responseText, cb);
 
         }
     };
     xhr.send();
 };
 
-Modal.prototype._view = function (html) { //_intent private method
+Modal.prototype._view = function (html, cb) { //_intent private method
+    var currentModal = this;
+
 
     this.elem = document.createElement("div");
 
     this.elem.classList.add("modal-container");
     this.elem.innerHTML = html;
     document.body.appendChild(this.elem);
-
     this.elem.querySelector(".modal").style.zIndex = this.index;
-    this.elem.querySelector(".modal-title").innerHTML = this.message; 
+    this.elem.querySelector(".modal-title").innerHTML = this.title;
+
+    if (this.title.includes("lost")) {
+        document.querySelector(".time-stamp").style.visibility = "hidden";
+        document.querySelector(".star-status").style.visibility = "hidden";
+    }
+    else {
+        document.querySelector(".time-stamp").style.visibility = "visible";
+        document.querySelector(".star-status").style.visibility = "visible";
+    }
+
+
+    this.elem.addEventListener("click", function (e) {
+        currentModal.clickHandler(e, cb);
+    }, false);
 
     Modal.collection.push(this);
 
 };
 
-Modal.prototype.clickHandler = function () {
-    
-}
+Modal.prototype.clickHandler = function (event, cb) {
+
+    if(event.target.classList.contains("ok")) {
+
+        cb();
+    }
+    this.close();
+
+};
 
 Modal.prototype.close = function () {
 
@@ -74,9 +95,8 @@ Modal.prototype.close = function () {
     for (var index = 0; index < Modal.collection.length; index++) {
         var modal = Modal.collection[index];
         if (modal === this) {
-             Modal.collection.splice(index,1);
+            Modal.collection.splice(index,1);
             break;
         }
     }
-
-}
+};
