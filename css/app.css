@@ -21,6 +21,10 @@ body {
     font-family: 'Coda', cursive;
 }
 
+h1 {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+}
 .container {
     display: flex;
     justify-content: center;
@@ -28,10 +32,18 @@ body {
     flex-direction: column;
 }
 
-h1 {
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 300;
+.hide {
+    display: none;
 }
+
+.invisible {
+    display: hidden;
+}
+
+.visible {
+    display: visible;
+}
+
 
 /*
  * Styles for the deck of cards
@@ -81,8 +93,8 @@ h1 {
     background-color: darkorange;
 }
 
-.hidden {
-    visibility: hidden;
+.faded {
+    color: rgba(141, 145, 148, 0.548);
 }
 
 /*
@@ -91,7 +103,7 @@ h1 {
 
 .score-panel {
     text-align: left;
-    width: 375px;
+    width: 550px;
     margin-bottom: 10px;
 }
 
@@ -112,12 +124,11 @@ h1 {
     cursor: pointer;
 }
 
-.time-holder {
+.time-holder, .moves-container {
     display: inline-block;
     margin: 0 50px;
     overflow: hidden;
 }
-.score-panel .chances-container {
+.score-panel, .chances-container, .moves-container {
     float: left;
 }
-

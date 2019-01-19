@@ -4,6 +4,8 @@
 
     "use strict";
 
+    var secondsB4Reveal = 3;//time reveal card symbol at once
+    var initialRevealTimerId; //set time out handler for card deck.
 
     // Create an object that contains game session properties.
     var session  = {
@@ -186,7 +188,7 @@
 
     /**
      * @description Determines if a gamer wins the game or looses a chance to win the game.
-     * Displays win or loss modal when player wins the game or when the player loses the game.
+     * Displays a win or loss modal depending whether a player wins the game or when the player loses the game.
      * @param {boolean} isMatch 
      */
     function verifyGameTries (isMatch) {
@@ -198,8 +200,8 @@
             if(session.playerMoves === session.maxNumberOfMoves) {
 
                 session.isPlaying = false;
-                var winModal = new Modal("You Win!", "\n\nYou time was: " + session.clockCounter +
-                " second(s)" + "\n\n", " Star Rating: " + session.gamerRating + " star(s)");
+                var winModal = new Modal("confirm","Congrats. You Won!", "\n\nYou time was: " + session.clockCounter +
+                " second(s)" + "\n\n", " Score:" + session.gamerRating + " star(s)");
 
                 //display modal for winning game
                 winModal.open(function (){
@@ -215,9 +217,9 @@
             if (session.maxTries === 0) {
 
                 session.isPlaying = false;
-                var loseModal = new Modal("Sorry, you lost!\n\n", 
-                "You found " + session.playerMoves + " matches" +
-                    "out of " + session.maxNumberOfMoves + matches
+                var loseModal = new Modal("confirm","Sorry, you lost!\n\n", 
+                "You found " + session.playerMoves +
+                    "\n\n out of " + session.maxNumberOfMoves + "\n\n pairs on this stage."
                 );
 
                 //display modal for winning game
@@ -311,7 +313,7 @@
         var stars = document.getElementsByClassName("status-symbol-holder");
 
         for(var i = session.gamerRanking; 3 > i; i++) {
-            stars[i].classList.add("hidden");
+            stars[i].classList.add("faded");
 
         }
     }
@@ -346,11 +348,13 @@
 
         showAllCards();
 
-        setTimeout(function(){
+        clearTimeout(initialRevealTimerId);
+
+        initialRevealTimerId = setTimeout(function(){
             session.isPlaying = true;
             hideAllCards();
             //manageGameClock();
-        }, 3000);
+        }, secondsB4Reveal * 1000);
     }
 
     function manageStarRanking () {
@@ -419,23 +423,32 @@
         }
     }
 
+    /**
+     * @description game info alert modal.
+     */
+    function displayHelpModal () {
 
-    /*
-    *  - set up the event listener for a card. If a card is clicked:
-    *  - display the card's symbol (put this functionality in another function that you call from this one)
-    *  - add the card to a *list* of "open" cards (put this functionality in another function that you call from this one)
-    *  - if the list already has another card, check to see if the two cards match
-    *    + if the cards do match, lock the cards in the open position (put this functionality in another function that you call from this one)
-    *    + if the cards do not match, remove the cards from the list and hide the card's symbol (put this functionality in another function that you call from this one)
-    *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
-    *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
-    */
+            var helpModal = new Modal("alert","Instructions:", 
+             "\n 1) Click the Ok button to close this prompt." +
+             "\n 2) After this prompt closes, cards on the deck will flipped up for " +
+                    secondsB4Reveal + " seconds to reveal their symbols." +
+             "\n 3) Wait for the cards to be flipped down." +
+             "\n 4) Then click matching pairs of cards on the deck to save matches." +
+             "\n 5) Finding all the matches in the card deck wins the game." +
+             "\n 6) If you want to reset the game, click the cycle symbol on the top right."
+            );
+
+            helpModal.open( function (){
+                  Modal.closeAll();
+                  resetGame();
+            });
+    }
 
     /**
      * @description Initalizes game and adds gameboard event listeners
      */
-    document.addEventListener("DOMContentLoaded", function (){     
-        resetGame();
+    document.addEventListener("DOMContentLoaded", function (){
+        displayHelpModal();
         deckEventListener();
         document.querySelector(".restart")
             .addEventListener("click", resetGame, false);

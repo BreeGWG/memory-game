@@ -9,13 +9,15 @@
 
 .modal-message {
     width: 400px;
-    height: 400px;
+    height: auto;
     margin: 10% auto;
+    padding: 10px;
     border-radius: 10px;
     border: 1px solid white;
     background: white;
     text-align: center;
 }
+
 
 .modal h1 {
     display: inline-block;
